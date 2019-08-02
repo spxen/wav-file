@@ -1,0 +1,19 @@
+CMAKE_MINIMUM_REQUIRED(VERSION 3.1)
+PROJECT(wav-file
+    VERSION 1.0
+    DESCRIPTION "Wav FILE Read/Write Library and Utility Project"
+    LANGUAGES C)
+
+INCLUDE_DIRECTORIES(${PROJECT_SOURCE_DIR})
+
+SET(EXECUTABLE_OUTPUT_PATH ${PROJECT_BINARY_DIR}/bin)
+
+ADD_EXECUTABLE(wav_info
+    ${PROJECT_SOURCE_DIR}/wav_info.c
+    ${PROJECT_SOURCE_DIR}/wav_file.c
+    ${PROJECT_SOURCE_DIR}/wav_file.h)
+
+ADD_EXECUTABLE(wav_file_test
+    ${PROJECT_SOURCE_DIR}/wav_file_test.c
+    ${PROJECT_SOURCE_DIR}/wav_file.c
+    ${PROJECT_SOURCE_DIR}/wav_file.h)

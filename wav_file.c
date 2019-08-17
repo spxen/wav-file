@@ -381,9 +381,11 @@ int wav_reader_read_i16(WavReader* reader, int num_samples, int16_t* samples) {
 
 static int wav_reader_read(WavReader* reader, enum WavFormat format, int bytes_per_sample,
                            int num_samples, void* samples_buf) {
+    num_samples = num_samples > reader->num_samples_left ? reader->num_samples_left : num_samples;
+
     if (format == reader->hdr.format && bytes_per_sample == reader->hdr.bytes_per_sample) {
         size_t read = fread(samples_buf, reader->hdr.block_align, num_samples, reader->fp);
-        assert(read <= num_samples && read <= reader->num_samples_left);
+        assert(read <= num_samples);
         reader->num_samples_left -= read;
         return read;
     } else {
@@ -398,7 +400,7 @@ static int wav_reader_read(WavReader* reader, enum WavFormat format, int bytes_p
             }
 
             size_t read_samples = fread(tmp, reader->hdr.block_align, request, reader->fp);
-            assert(read_samples <= request && read_samples <= reader->num_samples_left);
+            assert(read_samples <= request);
             reader->num_samples_left -= read_samples;
 
             if (format == kWavFormatFloat) {    // i16/i32 --> f32

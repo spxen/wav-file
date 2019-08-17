@@ -66,7 +66,7 @@ int wav_writer_write_i16(WavWriter* writer, int num_samples, const int16_t* samp
 
 ## Utilities
 
-- wav_info - display wav file information.
+- wav_info - display wav file information
 
 ~~~
 Usage:
@@ -84,3 +84,24 @@ Wav Information of sample.wav
          Number Samples:  220960
 ~~~
 
+- pcm2wav - convert pcm file to wav file
+
+~~~
+Usage: ./bin/pcm2wav [options]
+  -h, --help            show this help message and exit
+  -i PCM_FILE           pcm file
+  -o WAV_FILE           wav file
+  -c NUM_CHANNELS       num channels of pcm file, default 1
+  -s SAMPLE_RATE        sample rate of pcm file, default 16000
+  -b BITS_PER_SAMPLE    bits per sample of pcm file, default 16
+~~~
+
+- wav2pcm - convert wav file to pcm file
+
+~~~
+Usage: ./bin/wav2pcm [options]
+  -h, --help            show this help message and exit
+  -i WAV_FILE           wav file
+  -o PCM_FILE           pcm file
+  -b BITS_PER_SAMPLE    bits per sample of pcm file, default the same as wav file
+~~~

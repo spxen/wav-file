@@ -1,2 +1,6 @@
+*.o
+.deps
+.dirstamp
+
 .vscode
 build

@@ -70,10 +70,10 @@ int wav_writer_write_i16(WavWriter* writer, int num_samples, const int16_t* samp
 
 ~~~
 Usage:
-./wav_info wav_file
+./wav-info wav_file
 
 Example:
-./wav_info sample.wav
+./wav-info sample.wav
 
 Wav Information of sample.wav
            Audio Format:  int32
@@ -103,5 +103,16 @@ Usage: ./bin/wav2pcm [options]
   -h, --help            show this help message and exit
   -i WAV_FILE           wav file
   -o PCM_FILE           pcm file
+  -b BITS_PER_SAMPLE    bits per sample of pcm file, default the same as wav file
+~~~
+
+- wav-apm - wav file amplifier
+
+~~~
+Usage: wav-amp [options]
+  -h, --help            show this help message and exit
+  -i WAV_FILE           wav file
+  -o WAV_FILE           pcm file
+  -a amplifier_gain     amplifier gain between 0 and 1e6
   -b BITS_PER_SAMPLE    bits per sample of pcm file, default the same as wav file
 ~~~

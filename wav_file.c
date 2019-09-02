@@ -401,6 +401,11 @@ static int wav_reader_read(WavReader* reader, enum WavFormat format, int bytes_p
 
             size_t read_samples = fread(tmp, reader->hdr.block_align, request, reader->fp);
             assert(read_samples <= request);
+
+            if (read_samples == 0) {
+                break;
+            }
+
             reader->num_samples_left -= read_samples;
 
             if (format == kWavFormatFloat) {    // i16/i32 --> f32
@@ -436,6 +441,10 @@ static int wav_reader_read(WavReader* reader, enum WavFormat format, int bytes_p
             }
 
             ret += read_samples;
+
+            if (read_samples < request) {
+                break;
+            }
         }
 
         return ret;

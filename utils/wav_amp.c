@@ -8,7 +8,6 @@
 static const char* in_file = NULL;
 static const char* out_file = NULL;
 static float amp_gain = 1.f;
-static int out_bits_per_sample = -1;
 
 static void print_help(const char* program) {
     printf("Usage: %s [options]\n", program);
@@ -16,7 +15,6 @@ static void print_help(const char* program) {
     printf("  -i WAV_FILE           wav file\n");
     printf("  -o WAV_FILE           pcm file\n");
     printf("  -a amplifier_gain     amplifier gain between 0 and 1e6\n");
-    printf("  -b BITS_PER_SAMPLE    bits per sample of pcm file, default the same as wav file\n");
 }
 
 int main(int argc, const char* argv[]) {
@@ -35,8 +33,6 @@ int main(int argc, const char* argv[]) {
             out_file = argv[++i];
         } else if (strcmp(argv[i], "-a") == 0) {
             amp_gain = strtof(argv[++i], NULL);
-        } else if (strcmp(argv[i], "-b") == 0) {
-            out_bits_per_sample = atoi(argv[++i]);
         } else {
             printf("unknown option %s\n\n", argv[i]);
             return -1;
@@ -58,11 +54,6 @@ int main(int argc, const char* argv[]) {
         return -1;
     }
 
-    if (out_bits_per_sample > 0 && out_bits_per_sample != 16 && out_bits_per_sample != 32) {
-        printf("out bits per sample (%d) is invalid\n", out_bits_per_sample);
-        return -1;
-    }
-
     WavReader* reader = wav_reader_open(in_file);
 
     if (reader == NULL) {
@@ -72,13 +63,9 @@ int main(int argc, const char* argv[]) {
 
     int num_channels = wav_reader_get_num_channels(reader);
     int sample_rate = wav_reader_get_sample_rate(reader);
-    int bits_per_sample = wav_reader_get_bits_per_sample(reader);
+    SampleFormat format = wav_reader_get_sample_format(reader);
 
-    if (out_bits_per_sample < 0) {
-        out_bits_per_sample = bits_per_sample;
-    }
-
-    WavWriter* writer = wav_writer_open(out_file, num_channels, sample_rate, out_bits_per_sample);
+    WavWriter* writer = wav_writer_open(out_file, num_channels, sample_rate, format);
 
     if (writer == NULL) {
         printf("create out file %s failed (%s)\n", out_file, strerror(errno));

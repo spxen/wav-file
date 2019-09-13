@@ -32,8 +32,8 @@ int wav_reader_get_block_align(WavReader* reader);
 //   file format is int32, valid_bits_per_sample maybe 20/24.
 int wav_reader_get_valid_bits_per_sample(WavReader* reader);
 
-// return 1 if true else 0
-int wav_reader_is_format_f32(WavReader* reader);
+// return sample format
+SampleFormat wav_reader_get_sample_format(WavReader* reader);
 
 // return number of samples in each channel
 long wav_reader_get_num_samples(WavReader* reader);
@@ -52,9 +52,8 @@ typedef struct WavWriter WavWriter;
  *    - write multi-channel samples in interleaved mode
  */
 
-// bytes_per_sample must be 16 (int16) or 32 (float32)
 WavWriter* wav_writer_open(const char* filename, int num_channels, int sample_rate,
-                           int bits_per_sample);
+                           SampleFormat format);
 void wav_writer_close(WavWriter* writer);
 
 // Returns the number of samples written success
@@ -70,10 +69,10 @@ int wav_writer_write_i16(WavWriter* writer, int num_samples, const int16_t* samp
 
 ~~~
 Usage:
-./wav-info wav_file
+./wavinfo wav_file
 
 Example:
-./wav-info sample.wav
+./wavinfo sample.wav
 
 Wav Information of sample.wav
            Audio Format:  int32
@@ -93,7 +92,7 @@ Usage: ./bin/pcm2wav [options]
   -o WAV_FILE           wav file
   -c NUM_CHANNELS       num channels of pcm file, default 1
   -s SAMPLE_RATE        sample rate of pcm file, default 16000
-  -b BITS_PER_SAMPLE    bits per sample of pcm file, default 16
+  -f SAMPLE_FORMAT      sample format [i16|i32|f32], default f32
 ~~~
 
 - wav2pcm - convert wav file to pcm file
@@ -103,16 +102,15 @@ Usage: ./bin/wav2pcm [options]
   -h, --help            show this help message and exit
   -i WAV_FILE           wav file
   -o PCM_FILE           pcm file
-  -b BITS_PER_SAMPLE    bits per sample of pcm file, default the same as wav file
+  -f SAMPLE_FORMAT      sample format [i16|f32], default the same as wav file
 ~~~
 
-- wav-apm - wav file amplifier
+- wavapm - wav file amplifier
 
 ~~~
-Usage: wav-amp [options]
+Usage: wavamp [options]
   -h, --help            show this help message and exit
   -i WAV_FILE           wav file
   -o WAV_FILE           pcm file
   -a amplifier_gain     amplifier gain between 0 and 1e6
-  -b BITS_PER_SAMPLE    bits per sample of pcm file, default the same as wav file
 ~~~

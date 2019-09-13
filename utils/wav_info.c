@@ -35,11 +35,12 @@ int main(int argc, const char* argv[]) {
         return -1;
     }
 
-    int is_f32 = wav_reader_is_format_f32(reader);
+    SampleFormat format = wav_reader_get_sample_format(reader);
     int sample_bits = wav_reader_get_bits_per_sample(reader);
 
     printf("Wav Information of %s\n", wav_file);
-    printf("         Audio Format: %s\n", is_f32 ? "float32" : (sample_bits ? "int16" : "int32"));
+    printf("         Audio Format: %s\n",
+           format == kSampleFormatF32 ? "float32" : (format == kSampleFormatI16 ? "int16" : "int32"));
     printf("      Number Channels: %d\n", wav_reader_get_num_channels(reader));
     printf("          Sample Rate: %d\n", wav_reader_get_sample_rate(reader));
     printf("      Bits Per Sample: %d\n", sample_bits);

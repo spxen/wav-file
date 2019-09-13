@@ -9,16 +9,17 @@ static const char* pcm_file = NULL;
 static const char* wav_file = NULL;
 static int num_channels = 1;
 static int sample_rate = 16000;
-static int bits_per_sample = 16;
+static SampleFormat sample_format = kSampleFormatF32;
 
 static void print_help(const char* program) {
     printf("Usage: %s [options]\n", program);
     printf("  -h, --help            show this help message and exit\n");
     printf("  -i PCM_FILE           pcm file\n");
     printf("  -o WAV_FILE           wav file\n");
-    printf("  -c NUM_CHANNELS       num channels of pcm file, default %d\n", num_channels);
+    printf("  -c NUM_CHANNELS       num channels of pcm file [1-256], default %d\n", num_channels);
     printf("  -s SAMPLE_RATE        sample rate of pcm file, default %d\n", sample_rate);
-    printf("  -b BITS_PER_SAMPLE    bits per sample of pcm file, default %d\n", bits_per_sample);
+    printf("  -f SAMPLE_FORMAT      sample format [i16|i32|f32], default %s\n",
+           sample_format_get_str(sample_format));
 }
 
 int main(int argc, const char* argv[]) {
@@ -39,8 +40,22 @@ int main(int argc, const char* argv[]) {
             num_channels = atoi(argv[++i]);
         } else if (strcmp(argv[i], "-s") == 0) {
             sample_rate = atoi(argv[++i]);
-        } else if (strcmp(argv[i], "-b") == 0) {
-            bits_per_sample = atoi(argv[++i]);
+        } else if (strcmp(argv[i], "-f") == 0) {
+            const char* format = argv[++i];
+
+            if (format != NULL) {
+                if (strcmp(format, "i16") == 0) {
+                    sample_format = kSampleFormatI16;
+                } else if (strcmp(format, "i32") == 0) {
+                    sample_format = kSampleFormatI32;
+                } else if (strcmp(format, "f32") == 0) {
+                    sample_format = kSampleFormatF32;
+                } else {
+                    sample_format = kSampleFormatInvalid;
+                    printf("invalid sample format %s\n\n", format);
+                    return -1;
+                }
+            }
         } else {
             printf("unknown option %s\n\n", argv[i]);
             return -1;
@@ -67,11 +82,6 @@ int main(int argc, const char* argv[]) {
         return -1;
     }
 
-    if (bits_per_sample != 16 && bits_per_sample != 32) {
-        printf("bits per sample (%d) is invalid\n", bits_per_sample);
-        return -1;
-    }
-
     FILE* fp_pcm = fopen(pcm_file, "rb");
 
     if (fp_pcm == NULL) {
@@ -79,7 +89,7 @@ int main(int argc, const char* argv[]) {
         return -1;
     }
 
-    WavWriter* writer = wav_writer_open(wav_file, num_channels, sample_rate, bits_per_sample);
+    WavWriter* writer = wav_writer_open(wav_file, num_channels, sample_rate, sample_format);
 
     if (writer == NULL) {
         printf("open wav file %s failed\n", wav_file);
@@ -88,17 +98,19 @@ int main(int argc, const char* argv[]) {
     }
 
     int num_samples = sample_rate / 10;
-    int block_align = num_channels * bits_per_sample / 8;
+    int block_align = num_channels * sample_format_get_bytes_per_sample(sample_format);
     char* sample_buf = (char*)malloc(num_samples * block_align);
 
     while (1) {
         size_t ret = fread(sample_buf, block_align, num_samples, fp_pcm);
 
         if (ret > 0) {
-            if (bits_per_sample == 16) {
+            if (sample_format == kSampleFormatF32) {
+                wav_writer_write_f32(writer, (int)ret, (float*)sample_buf);
+            } else if (sample_format == kSampleFormatI16) {
                 wav_writer_write_i16(writer, (int)ret, (int16_t*)sample_buf);
             } else {
-                wav_writer_write_f32(writer, (int)ret, (float*)sample_buf);
+                wav_writer_write_i32(writer, (int)ret, (int32_t*)sample_buf);
             }
         }
 

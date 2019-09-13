@@ -2,5 +2,6 @@
 .deps
 .dirstamp
 
+.DS_Store
 .vscode
 build

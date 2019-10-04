@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 project(wav-file
-    VERSION 2.0.0
+    VERSION 2.0.1
     DESCRIPTION "Wav FILE Read/Write Library and Utility Project"
     LANGUAGES C)
 

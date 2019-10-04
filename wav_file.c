@@ -339,7 +339,7 @@ static inline int compare_format(const enum WavFormat wav_format, int bits_per_s
         }
     }
 
-    return 0;
+    return 1;
 }
 
 /* wav reader */
@@ -398,7 +398,7 @@ static int wav_reader_read(WavReader* reader, SampleFormat format,
                            int num_samples, void* samples_buf) {
     num_samples = num_samples > reader->num_samples_left ? reader->num_samples_left : num_samples;
 
-    if (compare_format(reader->hdr.format, reader->hdr.bytes_per_sample, format) == 0) {
+    if (compare_format(reader->hdr.format, reader->hdr.bytes_per_sample * 8, format) == 0) {
         size_t read = fread(samples_buf, reader->hdr.block_align, num_samples, reader->fp);
         assert(read <= num_samples);
         reader->num_samples_left -= read;
@@ -610,7 +610,7 @@ static long wav_writer_write(WavWriter* writer, SampleFormat format,
                                        (int32_t*)tmp);
                 }
             } else if (out_bits_per_sample == 16) {    // f32/i32 -> i16
-                if (format == kWavFormatFloat) {   // f32 -> i16
+                if (format == kSampleFormatF32) {   // f32 -> i16
                     convert_f32_to_i16((float*)samples_buf + ret * writer->hdr.num_channels,
                                        request * writer->hdr.num_channels,
                                        (int16_t*)tmp);

@@ -23,7 +23,7 @@ static inline const char* sample_format_get_str(SampleFormat format) {
         return "i32";
     }
 
-    return "";
+    return "invalid";
 }
 
 static inline int sample_format_get_bytes_per_sample(SampleFormat format) {
